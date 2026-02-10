@@ -79,7 +79,7 @@ export function processFeedback(
     return {
       accepted: false,
       reason: 'GOOSEGUARD: Redundant feedback pattern detected',
-      suggestedAction: guard.suggestedPivot
+      suggestedAction: guard.suggestion
     };
   }
 
