@@ -4,21 +4,29 @@
  * 
  * Installation: npm install mongodb
  * Documentation: https://www.mongodb.com/docs/drivers/node/current/
+ * 
+ * SECURITY: Credentials are loaded from environment variables.
+ * Set these before using:
+ * - MONGODB_USERNAME (optional if using connection URI)
+ * - MONGODB_PASSWORD (optional if using connection URI)
  */
 
 import { DatabaseAdapter, DatabaseConfig } from './base';
+import { validateQuery, requireEnv } from '../security';
 
 export interface MongoDBConfig extends DatabaseConfig {
   uri?: string;
   host?: string;
   port?: number;
   database: string;
-  username?: string;
-  password?: string;
   authSource?: string;
   replicaSet?: string;
   ssl?: boolean;
   maxPoolSize?: number;
+  maxIdleTimeMS?: number;
+  serverSelectionTimeoutMS?: number;
+  socketTimeoutMS?: number;
+  connectTimeoutMS?: number;
 }
 
 /**
@@ -26,12 +34,14 @@ export interface MongoDBConfig extends DatabaseConfig {
  * 
  * Example usage:
  * ```typescript
+ * // Set environment variables first:
+ * // MONGODB_USERNAME=myuser
+ * // MONGODB_PASSWORD=mypass
+ * 
  * const adapter = new MongoDBAdapter({
  *   host: 'localhost',
  *   port: 27017,
- *   database: 'mydb',
- *   username: 'user',
- *   password: 'pass'
+ *   database: 'mydb'
  * });
  * 
  * await adapter.connect();
@@ -40,10 +50,10 @@ export interface MongoDBConfig extends DatabaseConfig {
  * await adapter.disconnect();
  * ```
  */
-export class MongoDBAdapter implements DatabaseAdapter {
+export class MongoDBAdapter implements DatabaseAdapter<Record<string, unknown>> {
   private config: MongoDBConfig;
-  private client: any = null;
-  private db: any = null;
+  private client: unknown | null = null;
+  private db: unknown | null = null;
 
   constructor(config: MongoDBConfig) {
     this.config = config;
@@ -51,16 +61,24 @@ export class MongoDBAdapter implements DatabaseAdapter {
 
   /**
    * Builds MongoDB connection URI from config
+   * Loads credentials from environment variables for security
    */
   private getConnectionUri(): string {
     if (this.config.uri) {
       return this.config.uri;
     }
 
-    const { host = 'localhost', port = 27017, username, password, database, authSource = 'admin' } = this.config;
+    const { host = 'localhost', port = 27017, database, authSource = 'admin' } = this.config;
+    
+    // Load credentials from environment variables
+    const username = requireEnv('MONGODB_USERNAME', true);
+    const password = requireEnv('MONGODB_PASSWORD', true);
     
     if (username && password) {
-      return `mongodb://${username}:${password}@${host}:${port}/${database}?authSource=${authSource}`;
+      // Encode credentials to handle special characters safely
+      const encodedUser = encodeURIComponent(username);
+      const encodedPass = encodeURIComponent(password);
+      return `mongodb://${encodedUser}:${encodedPass}@${host}:${port}/${database}?authSource=${authSource}`;
     }
     
     return `mongodb://${host}:${port}/${database}`;
@@ -69,21 +87,25 @@ export class MongoDBAdapter implements DatabaseAdapter {
   async connect(): Promise<void> {
     try {
       // Dynamic import to avoid requiring MongoDB as a hard dependency
-      // @ts-ignore - Optional dependency
-      const { MongoClient } = await import('mongodb');
+      const mongodb = await import('mongodb').catch(() => {
+        throw new Error('MongoDB module not installed. Run: npm install mongodb');
+      });
+      const { MongoClient } = mongodb;
       
       const uri = this.getConnectionUri();
-      const options: any = {
-        maxPoolSize: this.config.maxPoolSize || 10,
+      const options = {
+        maxPoolSize: this.config.maxPoolSize ?? 10,
+        maxIdleTimeMS: this.config.maxIdleTimeMS ?? 30000,
+        serverSelectionTimeoutMS: this.config.serverSelectionTimeoutMS ?? 5000,
+        socketTimeoutMS: this.config.socketTimeoutMS ?? 45000,
+        connectTimeoutMS: this.config.connectTimeoutMS ?? 10000,
+        tls: this.config.ssl ?? false
       };
 
-      if (this.config.ssl) {
-        options.tls = true;
-      }
-
-      this.client = new MongoClient(uri, options);
-      await this.client.connect();
-      this.db = this.client.db(this.config.database);
+      const client = new MongoClient(uri, options);
+      await client.connect();
+      this.client = client;
+      this.db = client.db(this.config.database);
     } catch (error) {
       throw new Error(`MongoDB connection failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -91,49 +113,69 @@ export class MongoDBAdapter implements DatabaseAdapter {
 
   async disconnect(): Promise<void> {
     if (this.client) {
-      await this.client.close();
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (this.client as any).close();
       this.client = null;
       this.db = null;
     }
   }
 
-  async insertOne(collection: string, data: any): Promise<string> {
+  async insertOne(collection: string, data: Record<string, unknown>): Promise<string> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    const result = await this.db.collection(collection).insertOne(data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (this.db as any).collection(collection).insertOne(data);
     return result.insertedId.toString();
   }
 
-  async insertMany(collection: string, data: any[]): Promise<string[]> {
+  async insertMany(collection: string, data: Record<string, unknown>[]): Promise<string[]> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    const result = await this.db.collection(collection).insertMany(data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (this.db as any).collection(collection).insertMany(data);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return Object.values(result.insertedIds).map((id: any) => id.toString());
   }
 
-  async find(collection: string, query: Record<string, any>): Promise<any[]> {
+  async find(collection: string, query: Record<string, unknown>): Promise<Record<string, unknown>[]> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    return await this.db.collection(collection).find(query).toArray();
+    // Validate query to prevent NoSQL injection
+    validateQuery(query);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await (this.db as any).collection(collection).find(query).toArray();
   }
 
-  async findOne(collection: string, query: Record<string, any>): Promise<any | null> {
+  async findOne(collection: string, query: Record<string, unknown>): Promise<Record<string, unknown> | null> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    return await this.db.collection(collection).findOne(query);
+    // Validate query to prevent NoSQL injection
+    validateQuery(query);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await (this.db as any).collection(collection).findOne(query);
   }
 
-  async update(collection: string, query: Record<string, any>, update: Record<string, any>): Promise<number> {
+  async update(collection: string, query: Record<string, unknown>, update: Record<string, unknown>): Promise<number> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    const result = await this.db.collection(collection).updateMany(query, { $set: update });
+    // Validate query to prevent NoSQL injection
+    validateQuery(query);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (this.db as any).collection(collection).updateMany(query, { $set: update });
     return result.modifiedCount;
   }
 
-  async delete(collection: string, query: Record<string, any>): Promise<number> {
+  async delete(collection: string, query: Record<string, unknown>): Promise<number> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    const result = await this.db.collection(collection).deleteMany(query);
+    // Validate query to prevent NoSQL injection
+    validateQuery(query);
+    
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const result = await (this.db as any).collection(collection).deleteMany(query);
     return result.deletedCount;
   }
 
@@ -141,7 +183,8 @@ export class MongoDBAdapter implements DatabaseAdapter {
     if (!this.client) return false;
     
     try {
-      await this.client.db('admin').command({ ping: 1 });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (this.client as any).db('admin').command({ ping: 1 });
       return true;
     } catch {
       return false;
@@ -154,10 +197,11 @@ export class MongoDBAdapter implements DatabaseAdapter {
    * @param keys Index specification
    * @param options Index options
    */
-  async createIndex(collection: string, keys: Record<string, 1 | -1>, options?: any): Promise<string> {
+  async createIndex(collection: string, keys: Record<string, 1 | -1>, options?: Record<string, unknown>): Promise<string> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    return await this.db.collection(collection).createIndex(keys, options);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await (this.db as any).collection(collection).createIndex(keys, options);
   }
 
   /**
@@ -165,9 +209,10 @@ export class MongoDBAdapter implements DatabaseAdapter {
    * @param collection Collection name
    * @param pipeline Aggregation pipeline stages
    */
-  async aggregate(collection: string, pipeline: any[]): Promise<any[]> {
+  async aggregate(collection: string, pipeline: Record<string, unknown>[]): Promise<Record<string, unknown>[]> {
     if (!this.db) throw new Error('Not connected to MongoDB');
     
-    return await this.db.collection(collection).aggregate(pipeline).toArray();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return await (this.db as any).collection(collection).aggregate(pipeline).toArray();
   }
 }

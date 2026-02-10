@@ -3,6 +3,8 @@
  * Polar-complex vector math for high-precision intent alignment
  */
 
+import { sanitizeInput } from './security';
+
 // Weights for combining different scoring components
 const KEYWORD_WEIGHT = 0.4; // Weight for keyword overlap in pattern matching
 const HARMONIC_WEIGHT = 0.4; // Weight for harmonic alignment scoring
@@ -13,16 +15,21 @@ const TYPICAL_TOKEN_LENGTH = 10; // Expected number of tokens in a typical inten
 
 /**
  * Calculates pattern match confidence using harmonic field alignment
- * @param userRequest User's request string
+ * @param userRequest User's request string (will be sanitized)
  * @param pattern Pattern to match against
  * @returns Confidence score between 0 and 1
+ * @throws Error if userRequest exceeds maximum length
  */
 export function calculatePatternMatchConfidence(
   userRequest: string,
   pattern: string
 ): number {
-  const userTokens = tokenize(userRequest);
-  const patternTokens = tokenize(pattern);
+  // Sanitize input to prevent ReDoS and injection attacks
+  const sanitizedRequest = sanitizeInput(userRequest);
+  const sanitizedPattern = sanitizeInput(pattern);
+  
+  const userTokens = tokenize(sanitizedRequest);
+  const patternTokens = tokenize(sanitizedPattern);
   
   // Calculate keyword overlap
   const keywordScore = calculateKeywordOverlap(userTokens, patternTokens);
@@ -31,7 +38,7 @@ export function calculatePatternMatchConfidence(
   const harmonicScore = calculateHarmonicAlignment(userTokens, patternTokens);
   
   // Calculate intent magnitude
-  const magnitudeScore = calculateIntentMagnitude(userRequest, pattern);
+  const magnitudeScore = calculateIntentMagnitude(sanitizedRequest, sanitizedPattern);
   
   // Weighted combination
   return (keywordScore * KEYWORD_WEIGHT) + (harmonicScore * HARMONIC_WEIGHT) + (magnitudeScore * MAGNITUDE_WEIGHT);
@@ -39,6 +46,7 @@ export function calculatePatternMatchConfidence(
 
 /**
  * Tokenizes a string into normalized words
+ * Filters out short tokens (< 3 chars) to reduce noise
  */
 function tokenize(text: string): string[] {
   return text

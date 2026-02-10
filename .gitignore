@@ -28,6 +28,25 @@ Thumbs.db
 *.swp
 *.swo
 
-# Environment
+# Environment variables and secrets
 .env
 .env.local
+.env.*.local
+.env.production
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+service-account*.json
+firebase-adminsdk*.json
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
