@@ -7,48 +7,50 @@
  * Validates a database query object to prevent NoSQL injection attacks.
  * Checks for dangerous operators and prototype pollution attempts.
  * 
+ * NOTE: This implementation is deliberately restrictive to prevent injection attacks.
+ * For applications requiring MongoDB operators ($gt, $lt, etc.), implement a
+ * whitelist-based approach or use a query builder library.
+ * 
  * @param query The query object to validate
  * @throws Error if query contains disallowed operators or keys
  * 
  * @example
  * ```typescript
- * validateQuery({ name: "John" }); // OK
- * validateQuery({ $ne: null }); // Throws error
- * validateQuery({ __proto__: {} }); // Throws error
+ * validateQuery({ name: "John" }); // OK - simple equality
+ * validateQuery({ $ne: null }); // Throws error - operator not allowed
+ * validateQuery({ __proto__: {} }); // Throws error - prototype pollution
  * ```
  */
 export function validateQuery(query: Record<string, unknown>): void {
-  // List of disallowed query operators and dangerous keys
+  // List of dangerous keys that could enable injection or prototype pollution
   const disallowedKeys = [
-    '$where',
-    '$ne',
-    '$gt',
-    '$gte',
-    '$lt',
-    '$lte',
-    '$in',
-    '$nin',
-    '$or',
-    '$and',
-    '$not',
-    '$nor',
-    '$exists',
-    '$type',
-    '$regex',
     '__proto__',
     'constructor',
     'prototype'
   ];
+  
+  // MongoDB operators - blocked by default for maximum security
+  // If your application needs these, consider implementing a whitelist approach
+  // or using a query builder library that safely handles operators
+  const operatorKeys = [
+    '$where',  // Code execution risk
+    '$ne', '$gt', '$gte', '$lt', '$lte',  // Comparison operators
+    '$in', '$nin',  // Array operators
+    '$or', '$and', '$not', '$nor',  // Logical operators
+    '$exists', '$type', '$regex'  // Field operators
+  ];
 
-  // Check top-level keys
+  // Check top-level keys for dangerous patterns
+  const allDisallowed = [...disallowedKeys, ...operatorKeys];
   const hasDisallowed = Object.keys(query).some(key => 
-    disallowedKeys.includes(key) || key.startsWith('$')
+    allDisallowed.includes(key) || key.startsWith('$')
   );
 
   if (hasDisallowed) {
     throw new Error(
       'Invalid query: disallowed operators detected. ' +
-      'Only simple equality queries are allowed.'
+      'Only simple equality queries are supported for security. ' +
+      'For advanced queries, use a query builder or whitelist approach.'
     );
   }
 

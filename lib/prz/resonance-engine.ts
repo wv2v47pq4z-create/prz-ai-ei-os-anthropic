@@ -1,9 +1,13 @@
 /**
- * Pillar 2: Resonance Engine
+ * Resonance Engine (Pillar 2)
  * Measures intent alignment and trajectory using harmonic field matching
  * 
  * This module implements polar-complex vector math for high-precision
  * intent alignment as specified in the Seven Pillars.
+ * 
+ * Note: Originally documented as "Pillar 1" but is actually Pillar 2
+ * (Resonance Threshold) in the Seven Pillars framework. Pillar 1 is
+ * Complete-Then-Validate, which is implemented in pipeline.ts.
  */
 
 import { clamp } from '../security';

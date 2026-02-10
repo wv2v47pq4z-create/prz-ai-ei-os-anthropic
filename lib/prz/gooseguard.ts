@@ -6,9 +6,18 @@
  * to prevent false positives/negatives in loop detection.
  */
 
+import { validateRange } from '../security';
+
 // Constants for loop detection (configurable via environment variables)
-const LOOP_DETECTION_WINDOW_MS = parseInt(process.env.PRZ_LOOP_DETECTION_WINDOW_MS || '300000'); // 5 minutes
-const SIMILARITY_THRESHOLD = parseFloat(process.env.PRZ_LOOP_SIMILARITY_THRESHOLD || '0.80'); // 80% similarity
+const LOOP_DETECTION_WINDOW_MS_RAW = parseInt(process.env.PRZ_LOOP_DETECTION_WINDOW_MS || '300000');
+const SIMILARITY_THRESHOLD_RAW = parseFloat(process.env.PRZ_LOOP_SIMILARITY_THRESHOLD || '0.80');
+
+// Validate environment variable values
+validateRange(LOOP_DETECTION_WINDOW_MS_RAW, 1000, 3600000, 'PRZ_LOOP_DETECTION_WINDOW_MS');
+validateRange(SIMILARITY_THRESHOLD_RAW, 0, 1, 'PRZ_LOOP_SIMILARITY_THRESHOLD');
+
+const LOOP_DETECTION_WINDOW_MS = LOOP_DETECTION_WINDOW_MS_RAW; // 5 minutes default
+const SIMILARITY_THRESHOLD = SIMILARITY_THRESHOLD_RAW; // 80% similarity default
 const MAX_SIMILAR_ACTIONS = 3; // Maximum similar actions before triggering loop detection
 
 export interface Action {

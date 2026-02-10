@@ -87,7 +87,6 @@ export class MongoDBAdapter implements DatabaseAdapter<Record<string, unknown>> 
   async connect(): Promise<void> {
     try {
       // Dynamic import to avoid requiring MongoDB as a hard dependency
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const mongodb = await import('mongodb').catch(() => {
         throw new Error('MongoDB module not installed. Run: npm install mongodb');
       });
