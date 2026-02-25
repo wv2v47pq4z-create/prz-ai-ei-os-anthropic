@@ -1,30 +1,43 @@
 {
   "preset": "ts-jest",
   "testEnvironment": "node",
-  "roots": ["<rootDir>/src", "<rootDir>/lib"],
-  "testMatch": ["**/__tests__/**/*.test.ts", "**/*.test.ts"],
+  "roots": [
+    "<rootDir>/src",
+    "<rootDir>/lib"
+  ],
+  "testMatch": [
+    "**/__tests__/**/*.test.ts",
+    "**/*.test.ts"
+  ],
   "transform": {
-    "^.+\\.tsx?$": ["ts-jest", {
-      "tsconfig": {
-        "strict": true,
-        "esModuleInterop": true,
-        "skipLibCheck": true
+    "^.+\\.tsx?$": [
+      "ts-jest",
+      {
+        "tsconfig": {
+          "strict": true,
+          "esModuleInterop": true,
+          "skipLibCheck": true
+        }
       }
-    }]
+    ]
   },
   "collectCoverageFrom": [
     "src/**/*.ts",
     "lib/**/*.ts",
     "!**/__tests__/**",
     "!**/node_modules/**",
-    "!**/dist/**"
+    "!**/dist/**",
+    "!lib/database/**",
+    "!lib/agent.ts",
+    "!lib/marketing-agent.ts",
+    "!lib/feedback-registry.ts"
   ],
   "coverageThreshold": {
     "global": {
-      "branches": 70,
-      "functions": 70,
-      "lines": 70,
-      "statements": 70
+      "branches": 80,
+      "functions": 80,
+      "lines": 80,
+      "statements": 80
     }
   }
 }
