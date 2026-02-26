@@ -21,9 +21,20 @@ describe('ZAK Echoes Module', () => {
     });
 
     describe('findBestEcho', () => {
-        it('should currently return null (pending implementation)', () => {
-            // Based on the source code, this is a placeholder
-            expect(findBestEcho('test request')).toBeNull();
+        it('should find a matching echo for a relevant request', () => {
+            const result = findBestEcho('Refactor React component with better structure');
+            expect(result).not.toBeNull();
+            expect(result!.id).toBe('react_component_refactor');
+        });
+
+        it('should return null for a completely unrelated request', () => {
+            expect(findBestEcho('xyzzy')).toBeNull();
+        });
+
+        it('should find the security audit echo for security-related requests', () => {
+            const result = findBestEcho('Perform security audit and find vulnerabilities');
+            expect(result).not.toBeNull();
+            expect(result!.id).toBe('security_audit');
         });
     });
 

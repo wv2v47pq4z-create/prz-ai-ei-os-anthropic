@@ -23,16 +23,16 @@ export function calculatePatternMatchConfidence(
 ): number {
   const userTokens = tokenize(userRequest);
   const patternTokens = tokenize(pattern);
-  
+
   // Calculate keyword overlap
   const keywordScore = calculateKeywordOverlap(userTokens, patternTokens);
-  
+
   // Calculate semantic alignment using harmonic vectors
   const harmonicScore = calculateHarmonicAlignment(userTokens, patternTokens);
-  
+
   // Calculate intent magnitude
   const magnitudeScore = calculateIntentMagnitude(userRequest, pattern);
-  
+
   // Weighted combination
   return (keywordScore * KEYWORD_WEIGHT) + (harmonicScore * HARMONIC_WEIGHT) + (magnitudeScore * MAGNITUDE_WEIGHT);
 }
@@ -45,7 +45,7 @@ function tokenize(text: string): string[] {
     .toLowerCase()
     .replace(/[^\w\s]/g, ' ')
     .split(/\s+/)
-    .filter(t => t.length > 2);
+    .filter(t => t.length > 1);
 }
 
 /**
@@ -54,10 +54,10 @@ function tokenize(text: string): string[] {
 function calculateKeywordOverlap(tokensA: string[], tokensB: string[]): number {
   const setA = new Set(tokensA);
   const setB = new Set(tokensB);
-  
+
   const intersection = new Set([...setA].filter(x => setB.has(x)));
   const union = new Set([...setA, ...setB]);
-  
+
   return union.size > 0 ? intersection.size / union.size : 0;
 }
 
@@ -68,7 +68,7 @@ function calculateHarmonicAlignment(tokensA: string[], tokensB: string[]): numbe
   // Create frequency vectors
   const freqA = createFrequencyVector(tokensA);
   const freqB = createFrequencyVector(tokensB);
-  
+
   // Calculate cosine similarity
   return calculateCosineSimilarity(freqA, freqB);
 }
@@ -92,11 +92,11 @@ function calculateCosineSimilarity(
   freqB: Map<string, number>
 ): number {
   const allTokens = new Set([...freqA.keys(), ...freqB.keys()]);
-  
+
   let dotProduct = 0;
   let magA = 0;
   let magB = 0;
-  
+
   allTokens.forEach(token => {
     const a = freqA.get(token) || 0;
     const b = freqB.get(token) || 0;
@@ -104,7 +104,7 @@ function calculateCosineSimilarity(
     magA += a * a;
     magB += b * b;
   });
-  
+
   const magnitude = Math.sqrt(magA) * Math.sqrt(magB);
   return magnitude > 0 ? dotProduct / magnitude : 0;
 }
@@ -113,9 +113,9 @@ function calculateCosineSimilarity(
  * Calculates intent magnitude based on text characteristics
  */
 function calculateIntentMagnitude(requestA: string, requestB: string): number {
-  const lengthRatio = Math.min(requestA.length, requestB.length) / 
-                      Math.max(requestA.length, requestB.length);
-  
+  const lengthRatio = Math.min(requestA.length, requestB.length) /
+    Math.max(requestA.length, requestB.length);
+
   // Penalize large length differences
   return Math.pow(lengthRatio, 0.5);
 }
@@ -126,20 +126,20 @@ function calculateIntentMagnitude(requestA: string, requestB: string): number {
 export function intentToVector(intent: string): { magnitude: number; direction: number[] } {
   const tokens = tokenize(intent);
   const magnitude = Math.min(tokens.length / TYPICAL_TOKEN_LENGTH, 1); // Normalize by typical length
-  
+
   // Simple directional encoding based on key verbs
   const actionVerbs = ['create', 'build', 'make', 'generate', 'develop'];
   const analysisVerbs = ['analyze', 'review', 'check', 'examine', 'study'];
   const modifyVerbs = ['update', 'change', 'modify', 'fix', 'improve'];
-  
+
   let direction = [0, 0]; // [x, y] vector
-  
+
   tokens.forEach(token => {
     if (actionVerbs.includes(token)) direction[0] += 1;
     if (analysisVerbs.includes(token)) direction[1] += 1;
     if (modifyVerbs.includes(token)) direction[0] += 0.5;
   });
-  
+
   // Normalize direction
   const dirMag = Math.sqrt(direction[0] * direction[0] + direction[1] * direction[1]);
   if (dirMag > 0) {
@@ -147,6 +147,6 @@ export function intentToVector(intent: string): { magnitude: number; direction: 
   } else {
     direction = [1, 0]; // Default direction
   }
-  
+
   return { magnitude, direction };
 }

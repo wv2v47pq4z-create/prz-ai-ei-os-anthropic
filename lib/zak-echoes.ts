@@ -3,6 +3,8 @@
  * A library of harmonic patterns applied to standard tasks
  */
 
+import { calculatePatternMatchConfidence } from './harmonic-field';
+
 export interface ZakEcho {
   id: string;
   pattern: string;
@@ -68,11 +70,25 @@ export const zakEchoRegistry: ZakEcho[] = [
 
 /**
  * Finds the best matching ZAK Echo for a given request
+ * Uses harmonic field matching to score each echo pattern
+ * @param request The user's request string
+ * @returns Best matching echo or null if no echo meets minimum confidence
  */
 export function findBestEcho(request: string): ZakEcho | null {
-  // This would use the harmonic field matching in production
-  // For now, return null to allow the caller to handle matching
-  return null;
+  const MIN_ECHO_CONFIDENCE = 0.3;
+
+  let bestEcho: ZakEcho | null = null;
+  let bestConfidence = 0;
+
+  for (const echo of zakEchoRegistry) {
+    const confidence = calculatePatternMatchConfidence(request, echo.pattern);
+    if (confidence > bestConfidence && confidence >= MIN_ECHO_CONFIDENCE) {
+      bestConfidence = confidence;
+      bestEcho = echo;
+    }
+  }
+
+  return bestEcho;
 }
 
 /**

@@ -21,9 +21,9 @@ export function measureResonance(input: ResonanceInput, context: ResonanceContex
   const directionSim = calculateCosineSimilarity(input.direction, context.expectedDirection);
   const magnitudeMatch = 1 - Math.abs(input.magnitude - (context.patterns[0] || 0.5));
   const frequencyMatch = 1 - Math.abs(input.frequency - context.systemFrequency);
-  
+
   const score = (directionSim * 0.5) + (magnitudeMatch * 0.3) + (frequencyMatch * 0.2);
-  
+
   return {
     score,
     directionSim,
@@ -41,5 +41,6 @@ function calculateCosineSimilarity(a: number[], b: number[]) {
   const dotProduct = a.reduce((sum, val, i) => sum + val * (b[i] || 0), 0);
   const magA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
   const magB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
-  return dotProduct / (magA * magB) || 0;
+  const denominator = magA * magB;
+  return denominator > 0 ? dotProduct / denominator : 0;
 }
