@@ -74,7 +74,7 @@ export function processFeedback(
   }));
 
   const guard = beforeAction(action, feedbackActions);
-  
+
   if (!guard.shouldProceed) {
     return {
       accepted: false,
@@ -94,7 +94,7 @@ export function processFeedback(
 
   // Calculate resonance adjustment based on feedback
   let adjustedResonance = 0;
-  
+
   if (feedback.sentiment === 'positive') {
     adjustedResonance = POSITIVE_FEEDBACK_BOOST * feedback.intensity;
   } else if (feedback.sentiment === 'negative') {
@@ -219,16 +219,16 @@ export function shouldTransitionState(
   currentResonance: number
 ): { shouldTransition: boolean; newState: 'vapor' | 'crystal'; reason: string } {
   const adjustedResonance = adjustResonanceWithFeedback(currentResonance, feedback);
-  
+
   // Determine current and potential new state based on resonance
   const currentState = currentResonance >= 0.95 ? 'crystal' : 'vapor';
   const potentialState = adjustedResonance >= 0.95 ? 'crystal' : 'vapor';
-  
+
   if (currentState !== potentialState) {
     return {
       shouldTransition: true,
       newState: potentialState,
-      reason: potentialState === 'crystal' 
+      reason: potentialState === 'crystal'
         ? `Positive feedback increased resonance to ${adjustedResonance.toFixed(2)} (≥0.95)`
         : `Negative feedback decreased resonance to ${adjustedResonance.toFixed(2)} (<0.95)`
     };
@@ -269,8 +269,8 @@ export function detectContradictoryFeedback(
   let alternations = 0;
 
   for (let i = 1; i < sentiments.length; i++) {
-    if (sentiments[i] === 'positive' && sentiments[i - 1] === 'negative' ||
-        sentiments[i] === 'negative' && sentiments[i - 1] === 'positive') {
+    if ((sentiments[i] === 'positive' && sentiments[i - 1] === 'negative') ||
+      (sentiments[i] === 'negative' && sentiments[i - 1] === 'positive')) {
       alternations++;
     }
   }
