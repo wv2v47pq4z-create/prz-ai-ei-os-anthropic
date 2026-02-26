@@ -4,11 +4,12 @@
  *
  * Architecture:
  *   MeshCoordinator
- *     ├── MeshAgent("architect")  — designs systems, plans work
- *     ├── MeshAgent("builder")    — writes code, creates artifacts
- *     ├── MeshAgent("auditor")    — security audits, code review
- *     ├── MeshAgent("ops")        — deployment, monitoring, infra
- *     └── MeshAgent("analyst")    — data analysis, reporting
+ *     ├── MeshAgent("architect")   — designs systems, plans work
+ *     ├── MeshAgent("builder")     — writes code, creates artifacts
+ *     ├── MeshAgent("auditor")     — security audits, code review
+ *     ├── MeshAgent("ops")         — deployment, monitoring, infra
+ *     ├── MeshAgent("analyst")     — data analysis, reporting
+ *     └── MeshAgent("pathfinder")  — PATH diagnostics, tool discovery
  *
  * Routing is done via Harmonic Field matching — the request is vectorized
  * and routed to the agent with the highest resonance score.
@@ -21,7 +22,7 @@ import { UserFeedback } from './prz/user-feedback';
 
 // ── Types ────────────────────────────────────────────────────────────
 
-export type AgentRole = 'architect' | 'builder' | 'auditor' | 'ops' | 'analyst';
+export type AgentRole = 'architect' | 'builder' | 'auditor' | 'ops' | 'analyst' | 'pathfinder';
 
 export interface MeshMessage {
     id: string;
@@ -151,6 +152,24 @@ const AGENT_CONFIGS: MeshAgentConfig[] = [
         ],
         capabilities: ['data-analysis', 'reporting', 'metrics', 'insights'],
         maxConcurrent: 2
+    },
+    {
+        role: 'pathfinder',
+        description: 'PATH diagnostics, tool discovery, environment scanning, system configuration',
+        patterns: [
+            'find tool path',
+            'scan system path',
+            'discover installed tools',
+            'fix path configuration',
+            'check environment',
+            'locate binary',
+            'audit system path',
+            'find missing tools',
+            'configure environment variables',
+            'resolve command not found'
+        ],
+        capabilities: ['path-diagnostics', 'tool-discovery', 'env-scanning', 'auto-fix'],
+        maxConcurrent: 1
     }
 ];
 
@@ -371,6 +390,30 @@ export class MeshCoordinator {
 
             try {
                 delegation.result = await ops.execute(opsIntent);
+                delegation.status = 'complete';
+            } catch {
+                delegation.status = 'failed';
+            }
+
+            delegations.push(delegation);
+        }
+
+        // Infrastructure/tool intents get a pathfinder pass to verify tools exist
+        const pathKeywords = ['install', 'configure', 'setup', 'environment', 'tool', 'path', 'binary'];
+        const needsPathfinder = pathKeywords.some(kw => intent.toLowerCase().includes(kw));
+
+        if (needsPathfinder && primaryAgent !== 'pathfinder') {
+            const pathfinder = this.agents.get('pathfinder')!;
+            const pfIntent = `Verify tool availability: ${intent}`;
+            const delegation: MeshDelegation = {
+                from: primaryAgent,
+                to: 'pathfinder',
+                intent: pfIntent,
+                status: 'pending'
+            };
+
+            try {
+                delegation.result = await pathfinder.execute(pfIntent);
                 delegation.status = 'complete';
             } catch {
                 delegation.status = 'failed';
