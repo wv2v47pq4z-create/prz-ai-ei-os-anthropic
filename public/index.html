@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRZ-OS v3.0 Nexus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/style.css">
+    <script src="/socket.io/socket.io.js"></script>
+    <script defer src="/app.js"></script>
+</head>
+<body>
+    <div id="particles-js" class="background-anim"></div>
+    <div class="glass-container">
+        
+        <header class="header">
+            <div class="logo">
+                <div class="cube-spinner"></div>
+                <h1>PRZ-OS <span class="version">v3.0</span></h1>
+            </div>
+            <div class="resonance-hud">
+                <span class="hud-label">MESH RESONANCE</span>
+                <div class="resonance-bar">
+                    <div id="resonance-fill" class="resonance-fill" style="width: 100%"></div>
+                </div>
+                <span id="resonance-score" class="hud-value">1.000</span>
+            </div>
+            <div class="mesh-stats">
+                <div class="stat"><span class="label">Agents:</span><span id="stat-agents" class="value">7 Online</span></div>
+                <div class="stat"><span class="label">Msgs:</span><span id="stat-msgs" class="value">0</span></div>
+            </div>
+        </header>
+
+        <main class="dashboard">
+            <!-- Left Panel: Agent Roster -->
+            <section class="panel agent-roster">
+                <h2>AGENT MESH</h2>
+                <div class="agent-grid" id="agent-grid">
+                    <!-- Dynamically populated -->
+                </div>
+            </section>
+
+            <!-- Middle Panel: Terminal/Logs -->
+            <section class="panel terminal-panel">
+                <div class="terminal-header">
+                    <h2>SYSTEM LOGS</h2>
+                    <div class="dots"><span class="red"></span><span class="yellow"></span><span class="green"></span></div>
+                </div>
+                <div class="terminal-output" id="terminal-output">
+                    <div class="log system">PRZ-OS Nexus initialized. Waiting for mesh telemetry...</div>
+                </div>
+                <div class="input-container">
+                    <span class="prompt">❯</span>
+                    <input type="text" id="command-input" placeholder="Enter task or intent..." autocomplete="off">
+                    <button id="send-btn" class="glow-btn">DISPATCH</button>
+                    <button id="workflow-btn" class="glow-btn secondary">FULL WORKFLOW</button>
+                </div>
+            </section>
+
+        </main>
+    </div>
+</body>
+</html>

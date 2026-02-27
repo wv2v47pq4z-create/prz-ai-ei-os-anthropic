@@ -37,6 +37,8 @@
   "author": "superealityai-MYTH-OS",
   "license": "MIT",
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
     "@types/jest": "^30.0.0",
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^8.56.1",
@@ -55,5 +57,10 @@
     "mongodb": "^6.0.0",
     "neo4j-driver": "^5.0.0",
     "redis": "^4.0.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "socket.io": "^4.8.3"
   }
 }
