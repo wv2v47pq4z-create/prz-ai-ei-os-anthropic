@@ -9,7 +9,8 @@
  *     ├── MeshAgent("auditor")     — security audits, code review
  *     ├── MeshAgent("ops")         — deployment, monitoring, infra
  *     ├── MeshAgent("analyst")     — data analysis, reporting
- *     └── MeshAgent("pathfinder")  — PATH diagnostics, tool discovery
+ *     ├── MeshAgent("pathfinder")  — PATH diagnostics, tool discovery
+ *     └── MeshAgent("fixer")       — autonomous system repair
  *
  * Routing is done via Harmonic Field matching — the request is vectorized
  * and routed to the agent with the highest resonance score.
@@ -22,7 +23,7 @@ import { UserFeedback } from './prz/user-feedback';
 
 // ── Types ────────────────────────────────────────────────────────────
 
-export type AgentRole = 'architect' | 'builder' | 'auditor' | 'ops' | 'analyst' | 'pathfinder';
+export type AgentRole = 'architect' | 'builder' | 'auditor' | 'ops' | 'analyst' | 'pathfinder' | 'fixer';
 
 export interface MeshMessage {
     id: string;
@@ -169,6 +170,24 @@ const AGENT_CONFIGS: MeshAgentConfig[] = [
             'resolve command not found'
         ],
         capabilities: ['path-diagnostics', 'tool-discovery', 'env-scanning', 'auto-fix'],
+        maxConcurrent: 1
+    },
+    {
+        role: 'fixer',
+        description: 'Autonomous system repair, PATH cleanup, tool installation, config fixes',
+        patterns: [
+            'fix system issues',
+            'repair configuration',
+            'clean up path',
+            'remove invalid entries',
+            'install missing tools',
+            'repair environment',
+            'fix broken config',
+            'system health repair',
+            'auto fix',
+            'clean cache'
+        ],
+        capabilities: ['system-repair', 'path-cleanup', 'tool-install', 'config-fix', 'cache-clean'],
         maxConcurrent: 1
     }
 ];
