@@ -1,0 +1,12 @@
+e1664f35f9df8827a7b08708f38447bd67d3c3bf	refs/heads/PRZOS-VR
+daf3cc49b43f3b9d47f571fb1b02a93f7dd16bdf	refs/heads/codex/continue-agent-build
+f24f8489ccd93320e3ecc5cf3aeeea5184482a61	refs/heads/codex/design-agent-on-prz-os
+71976a6ca506d8712666a9f6b44361537cf51f99	refs/heads/copilot/add-user-feedback-feature
+f3a271fdd9d16cba48d3dc2698678f36d17059e1	refs/heads/copilot/build-code-feature
+e685573ad276d856e18f01deb8370828e5949081	refs/heads/copilot/build-marketing-agent
+a295113c6f3e4b98fe169a2f0f9cf2ed4b56e04a	refs/heads/copilot/build-marketing-agent-os
+0939b8fc82fc61390de07d8eb827a067e4c40014	refs/heads/copilot/build-project
+ec5d119893684dc422c5ed0050a832329f749e2e	refs/heads/copilot/conduct-audit-review
+96469bb25c1bf8edb4333a9d702b498a78ba2414	refs/heads/copilot/integrate-non-relational-databases
+80c87bd529a6fa1d822d086647e3ee2524ec2855	refs/heads/copilot/set-up-copilot-instructions
+9ae29b0342192f2e4b61822e562982bc592b50f2	refs/heads/revert-8-codex/design-agent-on-prz-os
