@@ -1,0 +1,15 @@
+{
+    "name": "unity-coding-agent",
+    "version": "1.0.0",
+    "description": "Autonomous coding agent that watches the Unity Editor log and resolves compiler errors using Claude.",
+    "main": "agent.js",
+    "scripts": {
+        "start": "node agent.js",
+        "install-deps": "npm install"
+    },
+    "dependencies": {
+        "@anthropic-ai/sdk": "^0.36.0",
+        "dotenv": "^16.4.7",
+        "tail": "^2.2.6"
+    }
+}
