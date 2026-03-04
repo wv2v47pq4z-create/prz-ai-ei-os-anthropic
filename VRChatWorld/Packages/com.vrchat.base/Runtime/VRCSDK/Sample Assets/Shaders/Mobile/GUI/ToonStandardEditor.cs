@@ -807,22 +807,22 @@ namespace VRC.ToonStandard
         void ResetToDefault(Material material, MaterialProperty property)
         {
             var index = material.shader.FindPropertyIndex(property.name);
-            switch(property.type)
+            switch(property.propertyType)
             {
-                case MaterialProperty.PropType.Int:
+                case ShaderPropertyType.Int:
                     property.intValue = material.shader.GetPropertyDefaultIntValue(index);
                     break;
-                case MaterialProperty.PropType.Range:
-                case MaterialProperty.PropType.Float:
+                case ShaderPropertyType.Range:
+                case ShaderPropertyType.Float:
                     property.floatValue = material.shader.GetPropertyDefaultFloatValue(index);
                     break;
-                case MaterialProperty.PropType.Color:
+                case ShaderPropertyType.Color:
                     property.colorValue = material.shader.GetPropertyDefaultVectorValue(index);
                     break;
-                case MaterialProperty.PropType.Vector:
+                case ShaderPropertyType.Vector:
                     property.vectorValue = material.shader.GetPropertyDefaultVectorValue(index);
                     break;
-                case MaterialProperty.PropType.Texture:
+                case ShaderPropertyType.Texture:
                     property.textureValue = null;
                     property.textureScaleAndOffset = new Vector4(1, 1, 0, 0);
                     break;

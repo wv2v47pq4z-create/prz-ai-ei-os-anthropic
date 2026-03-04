@@ -84,7 +84,7 @@ namespace VRC.SDK3.ClientSim
             
             if (_rigidbody != null)
             {
-                _rigidbody.velocity = Vector3.zero;
+                _rigidbody.linearVelocity = Vector3.zero;
             }
         }
 

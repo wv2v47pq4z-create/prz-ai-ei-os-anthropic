@@ -2,19 +2,18 @@
   "name": "com.przaiei.vrcworld.editor",
   "rootNamespace": "",
   "references": [
-    "com.przaiei.vrcworld.scripts"
+    "com.przaiei.vrcworld.scripts",
+    "UdonSharp.Runtime",
+    "VRC.SDKBase",
+    "VRC.SDK3",
+    "VRC.Udon",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": ["Editor"],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
-  "overrideReferences": true,
-  "precompiledReferences": [
-    "UdonSharp.Runtime.dll",
-    "VRC.SDKBase.dll",
-    "VRC.SDK3.dll",
-    "VRC.Udon.dll",
-    "Unity.TextMeshPro.dll"
-  ],
+  "overrideReferences": false,
+  "precompiledReferences": [],
   "autoReferenced": true,
   "defineConstraints": [],
   "versionDefines": [],

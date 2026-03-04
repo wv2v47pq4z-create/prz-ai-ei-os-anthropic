@@ -371,7 +371,7 @@ namespace VRC.SDK3.ClientSim
             // This check prevents setting the velocity to NaN due to divide by zero.
             if (Time.deltaTime > 0)
             {
-                _heldPickupRigidbody.velocity = (handTransform.position - _previousHandPosition) * (0.5f / Time.deltaTime);
+                _heldPickupRigidbody.linearVelocity = (handTransform.position - _previousHandPosition) * (0.5f / Time.deltaTime);
                 _heldPickupRigidbody.angularVelocity = (handTransform.rotation.eulerAngles - _previousHandRotation);
             }
             

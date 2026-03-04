@@ -34,7 +34,7 @@ public static class HDRColorFixerUtility
 
             foreach (MaterialProperty m in props)
             {
-                if (m.flags == MaterialProperty.PropFlags.HDR)
+                if (m.propertyFlags == UnityEngine.Rendering.ShaderPropertyFlags.HDR)
                 {
                     //Color prev = m.colorValue;
                     m.colorValue = (toLinear ? m.colorValue.linear : m.colorValue.gamma);

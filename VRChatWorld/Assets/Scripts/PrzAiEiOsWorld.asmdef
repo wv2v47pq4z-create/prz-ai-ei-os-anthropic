@@ -2,20 +2,17 @@
   "name": "com.przaiei.vrcworld.scripts",
   "rootNamespace": "",
   "references": [
-    "GUID:bc707e5a3fd6a374dab54a6b9399a4e3",
-    "GUID:6a15f7e327f8f71408db28a000dfc6c8"
+    "UdonSharp.Runtime",
+    "VRC.SDKBase",
+    "VRC.SDK3",
+    "VRC.Udon",
+    "Unity.TextMeshPro"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,
-  "overrideReferences": true,
-  "precompiledReferences": [
-    "UdonSharp.Runtime.dll",
-    "VRC.SDKBase.dll",
-    "VRC.SDK3.dll",
-    "VRC.Udon.dll",
-    "Unity.TextMeshPro.dll"
-  ],
+  "overrideReferences": false,
+  "precompiledReferences": [],
   "autoReferenced": true,
   "defineConstraints": [],
   "versionDefines": [],

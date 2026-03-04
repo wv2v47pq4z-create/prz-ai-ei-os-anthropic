@@ -25,7 +25,7 @@ namespace VRC.SDK3.ClientSim.EncodeDecoders
             
             data["Position"] = transform.position.GetJTokenFromVector3();
             data["Rotation"] = transform.rotation.GetJTokenFromQuaternion();
-            data["Velocity"] = hasRigidbody ? rigidbody.velocity.GetJTokenFromVector3() : "not available";
+            data["Velocity"] = hasRigidbody ? rigidbody.linearVelocity.GetJTokenFromVector3() : "not available";
             data["IsKinematic"] = !hasRigidbody || rigidbody.isKinematic;
             data["UseGravity"] = hasRigidbody && rigidbody.useGravity;
             data["Discontinuity"] = "not available";
@@ -78,7 +78,7 @@ namespace VRC.SDK3.ClientSim.EncodeDecoders
             
             if(data.TryGetValue("Velocity", out DataToken velocityToken))
             {
-                if (rigidbody != null && rigidbody.velocity != velocityToken.GetVector3())
+                if (rigidbody != null && rigidbody.linearVelocity != velocityToken.GetVector3())
                 {
                     return true;
                 }
@@ -131,7 +131,7 @@ namespace VRC.SDK3.ClientSim.EncodeDecoders
             {
                 if (rigidbody != null)
                 {
-                    rigidbody.velocity = velocityToken.GetVector3();
+                    rigidbody.linearVelocity = velocityToken.GetVector3();
                 }
             }
             

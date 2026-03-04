@@ -108,12 +108,30 @@ public class VRChatSceneBuilder : EditorWindow
         var panelRect = panel.GetComponent<RectTransform>();
         panelRect.sizeDelta = new Vector2(300f, 400f);
 
+        // ── Nexus Core ───────────────────────────────────────────────────
+        GameObject nexus = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        nexus.name = "PRZ-OS_Nexus_Core";
+        nexus.transform.position = new Vector3(0f, 5f, 0f);
+        nexus.transform.localScale = Vector3.one * 2f;
+        SetMaterialColor(nexus, new Color(1f, 0.4f, 1f)); // Glowing Magenta
+
+        // ── Data Packets (Physics Objects) ───────────────────────────────
+        for (int i = 0; i < 3; i++)
+        {
+            GameObject packet = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            packet.name = $"DataPacket_0{i}";
+            packet.transform.position = new Vector3(-2f + (i * 2f), 1f, 2f);
+            packet.transform.localScale = Vector3.one * 0.4f;
+            packet.AddComponent<Rigidbody>();
+            SetMaterialColor(packet, new Color(0f, 0.8f, 1f)); // Cyber Cyan
+        }
+
         Debug.Log("[PRZ-OS] ✅ VRChat scene built successfully. Open scene in Unity to attach scripts and VRCWorld prefab.");
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
 
         EditorUtility.DisplayDialog(
             "PRZ-OS Build Complete ✅",
-            "World scene configured!\n\nNext steps:\n1. Drag 'VRCWorld' prefab into Hierarchy\n2. Attach WorldController.cs to VRCWorld\n3. Attach MirrorToggle.cs to Mirror\n4. Attach InteractButton.cs to TeleportButton\n5. SDK > Build & Publish",
+            "World scene configured with PRZ-OS Physics elements!\n\nNext steps:\n1. Drag 'VRCWorld' prefab into Hierarchy\n2. Attach WorldController.cs to VRCWorld\n3. Attach MeshPhysicsController.cs to the PRZ-OS_Nexus_Core\n4. Attach DataPacket.cs to the DataPackets\n5. SDK > Build & Publish",
             "Got it!"
         );
     }
