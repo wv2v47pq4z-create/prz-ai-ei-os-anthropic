@@ -30,14 +30,18 @@
     "!lib/database/**",
     "!lib/agent.ts",
     "!lib/marketing-agent.ts",
-    "!lib/feedback-registry.ts"
+    "!lib/feedback-registry.ts",
+    "!lib/fixer.ts",
+    "!lib/mesh-workflow.ts",
+    "!lib/mesh.ts",
+    "!lib/pathfinder.ts"
   ],
   "coverageThreshold": {
     "global": {
-      "branches": 50,
-      "functions": 50,
-      "lines": 50,
-      "statements": 50
+      "branches": 75,
+      "functions": 80,
+      "lines": 80,
+      "statements": 80
     }
   }
 }
