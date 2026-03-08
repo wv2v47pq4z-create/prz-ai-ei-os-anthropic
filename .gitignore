@@ -29,6 +29,9 @@ Thumbs.db
 *.swp
 *.swo
 
+# Coverage
+coverage/
+
 # Environment
 .env
 .env.local
